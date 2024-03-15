@@ -10,6 +10,7 @@ const B2BState = (props) => {
   const [recommendationsData, setRecommendationsData] = useState();
   const [data, setData] = useState();
   const [reviews, setReviews] = useState();
+  const [loading, setLoading] = useState(false);
 
   const get_prediction = (e) => {
     setSearchResults([]);
@@ -58,6 +59,8 @@ const B2BState = (props) => {
 
   useEffect(() => {
     if (data?.about?.movie_id) {
+      setRecommendationsData([]);
+      setReviews([]);
       get_prediction(data?.about?.movie_id);
       get_reviews(data?.about?.movie_id);
     }
@@ -76,6 +79,9 @@ const B2BState = (props) => {
         get_prediction,
         get_reviews,
         reviews,
+        loading,
+        setLoading,
+        setRecommendationsData,
       }}
     >
       {props.children}

@@ -7,8 +7,14 @@ import Context from "../Context/Context";
 
 const Navbar = () => {
   const [search, setSearch] = useState("");
-  const { searchResults, setSearchResults, get_prediction, setData } =
-    useContext(Context);
+  const {
+    searchResults,
+    setSearchResults,
+    get_prediction,
+    setData,
+    setLoading,
+    setRecommendationsData,
+  } = useContext(Context);
 
   const submit = () => {
     axios
@@ -22,10 +28,12 @@ const Navbar = () => {
   };
 
   const get_details = (e) => {
+    setLoading(true);
     axios
       .get(`${BASE_URL}/get-details?id=${e?.movie_id}`)
       .then((res) => {
         setData(res.data);
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
@@ -69,6 +77,8 @@ const Navbar = () => {
                   onClick={() => {
                     get_prediction(e?.movie_id);
                     get_details(e);
+                    setData();
+                    setRecommendationsData([]);
                   }}
                   className="cursor-pointer py-0.5 hover:bg-gray-700 px-3 rounded-md transition-all my-0.5"
                 >
