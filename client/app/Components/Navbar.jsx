@@ -49,7 +49,7 @@ const Navbar = () => {
         <div className="flex items-center relative">
           <input
             type="search"
-            placeholder="Search Here.."
+            placeholder="Jawan (2023).."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
