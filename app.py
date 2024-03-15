@@ -5,6 +5,7 @@ import pickle
 import requests
 from bs4 import BeautifulSoup
 import json
+import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
