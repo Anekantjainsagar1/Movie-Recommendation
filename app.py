@@ -103,12 +103,15 @@ def get_details():
         rating = json.loads(rating_html)
         if rating:
             rating = rating.get('aggregateRating', {}).get('ratingValue', None)
-            
+      
+    poster = None        
     poster_html = soup.find_all('script', type='application/ld+json')
     if poster_html:
         rating_json = json.loads(poster_html[0].string)
         if(rating_json):
             poster = rating_json.get('image', None)
+            
+    director = None
     director_html = soup.find_all('a', class_="ipc-metadata-list-item__list-content-item ipc-metadata-list-item__list-content-item--link")
     if director_html:
         director = director_html[0].text
