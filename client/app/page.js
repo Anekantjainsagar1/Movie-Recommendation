@@ -1,16 +1,11 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Context from "./Context/Context";
 import { AiOutlineDown, AiOutlineRight } from "react-icons/ai";
 import { Oval } from "react-loader-spinner";
 
 const App = () => {
-  const {
-    data,
-    recommendationsData,
-    reviews,
-    loading,
-  } = useContext(Context);
+  const { data, recommendationsData, reviews, loading } = useContext(Context);
   const [showMore, setShowMore] = useState(false);
   const [showReview, setShowReview] = useState(false);
 
@@ -175,16 +170,16 @@ const App = () => {
         <h1 className="text-2xl md:text-xl md:font-normal font-bold flex items-center">
           Reviews <AiOutlineRight className="ml-3" />
         </h1>
-        {reviews?.length > 0 ? (
+        {reviews?.review ? (
           <>
             <div className="grid md:grid-cols-2 md:gap-y-4 gap-y-4 px-2 mb-2 mt-3 gap-x-4">
-              {reviews
+              {Object.values(reviews?.review)
                 ?.slice(0, showReview ? reviews.length : 6)
                 ?.map((e, i) => {
-                  return <ReviewBlock data={e} key={i} />;
+                  return <ReviewBlock data={e} key={i} index={i} />;
                 })}
             </div>
-            {reviews?.length > 9 && !showReview && (
+            {Object.values(reviews?.review)?.length > 9 && !showReview && (
               <button
                 onClick={() => {
                   setShowReview(!showReview);
@@ -289,30 +284,53 @@ const Block = ({ data }) => {
   );
 };
 
-const ReviewBlock = ({ data }) => {
+const ReviewBlock = ({ data, index }) => {
+  const { reviews } = useContext(Context);
   const [state, setState] = useState(false);
+  const [sentiment, setSentiment] = useState("");
+
+  useEffect(() => {
+    let arr = [
+      reviews?.positive[index],
+      reviews?.negative[index],
+      // reviews?.neutral[index],
+    ];
+    let maxVal = Math.max(...arr);
+    let maxIndex = arr.indexOf(maxVal);
+    setSentiment(maxIndex);
+  }, [data]);
 
   return (
     <div
-      className="border py-1 px-2 rounded-md border-gray-300 cursor-pointer"
+      className={`border py-1 px-2 h-fit rounded-md border-gray-300 cursor-pointer ${
+        sentiment == 0
+          ? "border-green-300"
+          : sentiment == 1
+          ? "border-red-300"
+          : "border-yellow-300"
+      }`}
       onClick={(e) => {
         setState(!state);
       }}
     >
       <div className="flex items-start justify-between w-full">
         <h1 className={`${state ? "line-clamp-0" : "line-clamp-1"} text-lg`}>
-          {data?.title}
+          {reviews?.title[index]}
         </h1>
-        <p className="text-gray-300">{data?.rating}/10</p>
+        {reviews?.rating[index] && (
+          <p className="text-gray-300">{reviews?.rating[index]}/10</p>
+        )}
       </div>
       <p
         className={`${
           !state ? "line-clamp-2" : "line-clamp-0"
         } text-gray-300 px-1`}
       >
-        {data?.review}
+        {data}
       </p>
-      <p className="text-gray-300 text-end mt-1">{data?.date}</p>
+      {reviews?.date[index] && (
+        <p className="text-gray-300 text-end mt-1">{reviews?.date[index]}</p>
+      )}
     </div>
   );
 };

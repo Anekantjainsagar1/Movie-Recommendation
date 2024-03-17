@@ -6,6 +6,9 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import pandas as pd
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+nltk.download('vader_lexicon')
 
 app = Flask(__name__)
 CORS(app)
@@ -195,5 +198,25 @@ def get_reviews():
             'name':name
         }
         final_review_data.append(dictionary)
+        
+    reviews_df = pd.DataFrame(final_review_data)
+    analyzer = SentimentIntensityAnalyzer()
+    def positive(str):
+        scores = analyzer.polarity_scores(str)
+        return scores['pos']*100
+    def negative(str):
+        scores = analyzer.polarity_scores(str)
+        return scores['neg']*100
+    def neutral(str):
+        scores = analyzer.polarity_scores(str)
+        return scores['neu']*100
+
+    reviews_df['positive'] = reviews_df['review'].apply(positive)
+    reviews_df['negative'] = reviews_df['review'].apply(negative)
+    reviews_df['neutral'] = reviews_df['review'].apply(neutral)
+    reviews_df = reviews_df.to_dict()
     
-    return jsonify(final_review_data)
+    return jsonify(reviews_df)
+
+if __name__ == "__main__":
+    app.run(debug=True)
